@@ -19,7 +19,6 @@ data class MemberResponse(
     @field:Schema(description = "가입 일시") val createdAt: LocalDateTime?,
 ) {
     companion object {
-        /** profileImageUrl은 저장된 key로부터 조립된 전체 URL을 전달받는다. */
         fun from(
             member: Member,
             profileImageUrl: String?,

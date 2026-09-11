@@ -6,39 +6,31 @@ import org.junit.jupiter.api.Test
 class OAuth2UserInfoTest {
     @Test
     fun `네이버 연령대 10대를 TEENS로 파싱한다`() {
-        // given
         val userInfo = naverUserInfo(age = "10-19")
 
-        // when & then
         assertThat(userInfo.ageGroup).isEqualTo("TEENS")
     }
 
     @Test
     fun `네이버 연령대 20대를 TWENTIES로 파싱한다`() {
-        // given
         val userInfo = naverUserInfo(age = "20-29")
 
-        // when & then
         assertThat(userInfo.ageGroup).isEqualTo("TWENTIES")
     }
 
     @Test
     fun `네이버 연령대 30대를 THIRTIES로 파싱한다`() {
-        // given
         val userInfo = naverUserInfo(age = "30-39")
 
-        // when & then
         assertThat(userInfo.ageGroup).isEqualTo("THIRTIES")
     }
 
     @Test
     fun `네이버 연령대를 구간별로 파싱한다`() {
-        // given
         val forties = naverUserInfo(age = "40-49")
         val fifties = naverUserInfo(age = "50-59")
         val sixties = naverUserInfo(age = "60-")
 
-        // when & then
         assertThat(forties.ageGroup).isEqualTo("FORTIES")
         assertThat(fifties.ageGroup).isEqualTo("FIFTIES")
         assertThat(sixties.ageGroup).isEqualTo("SIXTIES_PLUS")
@@ -46,45 +38,36 @@ class OAuth2UserInfoTest {
 
     @Test
     fun `네이버 연령대 정보가 없으면 null을 반환한다`() {
-        // given
         val userInfo = naverUserInfo(age = null)
 
-        // when & then
         assertThat(userInfo.ageGroup).isNull()
     }
 
     @Test
     fun `카카오 연령대 10대를 TEENS로 파싱한다`() {
-        // given
         val early = kakaoUserInfo(ageRange = "10-14")
         val late = kakaoUserInfo(ageRange = "15-19")
 
-        // when & then
         assertThat(early.ageGroup).isEqualTo("TEENS")
         assertThat(late.ageGroup).isEqualTo("TEENS")
     }
 
     @Test
     fun `카카오 연령대 20대를 TWENTIES로 파싱한다`() {
-        // given
         val userInfo = kakaoUserInfo(ageRange = "20-29")
 
-        // when & then
         assertThat(userInfo.ageGroup).isEqualTo("TWENTIES")
     }
 
     @Test
     fun `카카오 연령대 30대를 THIRTIES로 파싱한다`() {
-        // given
         val userInfo = kakaoUserInfo(ageRange = "30-39")
 
-        // when & then
         assertThat(userInfo.ageGroup).isEqualTo("THIRTIES")
     }
 
     @Test
     fun `카카오 연령대를 구간별로 파싱한다`() {
-        // given
         val forties = kakaoUserInfo(ageRange = "40-49")
         val fifties = kakaoUserInfo(ageRange = "50-59")
         val sixties = kakaoUserInfo(ageRange = "60-69")
@@ -92,7 +75,6 @@ class OAuth2UserInfoTest {
         val eighties = kakaoUserInfo(ageRange = "80-89")
         val ninetyPlus = kakaoUserInfo(ageRange = "90-")
 
-        // when & then
         assertThat(forties.ageGroup).isEqualTo("FORTIES")
         assertThat(fifties.ageGroup).isEqualTo("FIFTIES")
         assertThat(sixties.ageGroup).isEqualTo("SIXTIES_PLUS")
@@ -103,10 +85,8 @@ class OAuth2UserInfoTest {
 
     @Test
     fun `카카오 연령대 정보가 없으면 null을 반환한다`() {
-        // given
         val userInfo = kakaoUserInfo(ageRange = null)
 
-        // when & then
         assertThat(userInfo.ageGroup).isNull()
     }
 

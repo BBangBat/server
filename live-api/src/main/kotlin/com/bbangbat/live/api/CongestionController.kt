@@ -34,7 +34,7 @@ class CongestionController(
 ) {
     @Operation(
         summary = "혼잡도 투표",
-        description = "대전 지역 사용자가 가게의 현재 혼잡도를 투표합니다. 회원/비회원 모두 가능하며, 같은 사용자의 재투표는 덮어씁니다.",
+        description = "가게의 현재 혼잡도를 투표합니다. 회원/비회원 모두 가능하며, 같은 사용자의 재투표는 덮어씁니다.",
     )
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "투표 완료, 갱신된 혼잡도 반환"),
@@ -58,18 +58,6 @@ class CongestionController(
                 ),
             ],
         ),
-        ApiResponse(
-            responseCode = "403",
-            description = "대전 지역 외 위치",
-            content = [
-                Content(
-                    schema = Schema(implementation = ErrorResponse::class),
-                    examples = [
-                        ExampleObject(value = "{\"code\": \"OUT_OF_SERVICE_AREA\", \"message\": \"대전 지역에서만 이용할 수 있습니다.\"}"),
-                    ],
-                ),
-            ],
-        ),
     )
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
@@ -82,8 +70,6 @@ class CongestionController(
             congestionService.vote(
                 storeId = request.storeId!!,
                 level = request.level!!,
-                latitude = request.latitude!!,
-                longitude = request.longitude!!,
                 voter = voter,
             )
 

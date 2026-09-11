@@ -14,7 +14,6 @@ class TokenService(
     private val redisTemplate: StringRedisTemplate,
     private val jwtProvider: JwtProvider,
     private val jwtProperties: JwtProperties,
-    // 단일 Redis(Upstash)를 dev/prod가 공유할 때 키 충돌 방지용 환경 프리픽스 (예: "dev:", "prod:")
     @param:Value("\${app.redis.key-prefix:}") private val keyPrefix: String,
 ) {
     private fun rtKey(memberId: Long): String = "${keyPrefix}RT:$memberId"
@@ -38,7 +37,6 @@ class TokenService(
 
         if (stored != refreshToken) throw BbangbatException(INVALID_TOKEN)
 
-        // 재발급 시에도 로그인에 사용한 제공자를 유지한다.
         val provider = jwtProvider.getProvider(refreshToken)
         val newAccessToken = jwtProvider.createAccessToken(memberId, provider)
         val newRefreshToken = jwtProvider.createRefreshToken(memberId, provider)

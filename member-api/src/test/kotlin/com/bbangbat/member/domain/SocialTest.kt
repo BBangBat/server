@@ -20,24 +20,19 @@ class SocialTest {
 
     @Test
     fun `유효한 소셜 계정을 생성할 수 있다`() {
-        // given
         val provider = NAVER
         val providerId = "naver_12345"
 
-        // when
         val social = Social(member = member, provider = provider, providerId = providerId)
 
-        // then
         assertThat(social.provider).isEqualTo(NAVER)
         assertThat(social.providerId).isEqualTo("naver_12345")
     }
 
     @Test
     fun `소셜 제공자 ID가 비어있으면 예외가 발생한다`() {
-        // given
         val providerId = ""
 
-        // when & then
         assertThrows<IllegalArgumentException> {
             Social(member = member, provider = KAKAO, providerId = providerId)
         }
@@ -45,10 +40,8 @@ class SocialTest {
 
     @Test
     fun `소셜 제공자 ID가 공백만 있으면 예외가 발생한다`() {
-        // given
         val providerId = "   "
 
-        // when & then
         assertThrows<IllegalArgumentException> {
             Social(member = member, provider = KAKAO, providerId = providerId)
         }

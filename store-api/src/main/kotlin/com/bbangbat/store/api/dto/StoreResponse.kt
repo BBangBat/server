@@ -30,7 +30,6 @@ data class StoreResponse(
                 reviewCount = reviewCount,
             )
 
-        /** 가게 목록 + 빵명록 수 일괄 조회 결과를 합쳐 응답으로 만든다. */
         fun listOf(
             stores: List<Store>,
             reviewCounts: Map<Long, Long>,

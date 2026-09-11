@@ -8,13 +8,6 @@ import org.springframework.http.ResponseCookie
 import org.springframework.web.filter.OncePerRequestFilter
 import java.time.Duration
 
-/**
- * OAuth2 로그인 시작 요청(/oauth2/authorization/{provider})의 파라미터를 쿠키로 옮겨
- * provider 콜백 이후의 성공 핸들러까지 전달한다. (세션 STATELESS라 세션 대신 쿠키 사용)
- *
- * - redirect_uri: 허용목록 검증 후 최종 리다이렉트 대상 결정에 사용
- * - purpose=unlink: 연동 해제/탈퇴를 위한 재인증임을 표시. 이때만 소셜 토큰을 잠시 보관한다.
- */
 class OAuth2RedirectUriCookieFilter(
     allowedOrigins: String,
 ) : OncePerRequestFilter() {
@@ -47,10 +40,6 @@ class OAuth2RedirectUriCookieFilter(
         filterChain.doFilter(request, response)
     }
 
-    /**
-     * provider 콜백은 크로스사이트 top-level GET 네비게이션이라 SameSite=Lax로 전달된다.
-     * (None은 CSRF 비활성 환경에서 노출면만 넓히므로 사용하지 않는다)
-     */
     private fun shortLivedCookie(
         name: String,
         value: String,
@@ -69,10 +58,8 @@ class OAuth2RedirectUriCookieFilter(
         const val REDIRECT_URI_COOKIE = "oauth2_redirect_uri"
         const val PURPOSE_COOKIE = "oauth2_purpose"
 
-        /** 연동 해제/탈퇴용 재인증 (소셜 토큰을 잠시 보관) */
         const val PURPOSE_UNLINK = "unlink"
 
-        /** 로그인 상태에서 새 소셜 계정 연동 (로그인 처리 대신 임시 토큰 발급) */
         const val PURPOSE_LINK = "link"
 
         private val KNOWN_PURPOSES = setOf(PURPOSE_UNLINK, PURPOSE_LINK)

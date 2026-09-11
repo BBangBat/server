@@ -15,6 +15,7 @@ import java.time.LocalDateTime
     indexes = [
         Index(name = "idx_talk_store_created_at", columnList = "store_id, created_at"),
         Index(name = "idx_talk_author_id", columnList = "author_id"),
+        Index(name = "idx_talk_deleted_created", columnList = "deleted_at, created_at"),
     ],
 )
 class LiveTalkMessageJpaEntity(
@@ -30,14 +31,9 @@ class LiveTalkMessageJpaEntity(
     var authorNickname: String,
     @Column(name = "content", nullable = false, length = LiveTalkMessage.MAX_CONTENT_LENGTH)
     var content: String,
-    /** 소프트 삭제 시각. null이면 살아 있는 메시지. 조회는 모두 이 값이 null인 것만 대상으로 한다. */
     @Column(name = "deleted_at", nullable = true)
     var deletedAt: LocalDateTime? = null,
 ) : BaseEntity() {
-    /**
-     * 도메인 상태를 영속 엔티티에 반영한다. (더티체킹)
-     * 어떤 필드가 바뀔 수 있는지는 도메인이 결정하므로 여기서는 상태를 그대로 옮겨 담는다.
-     */
     fun applyFrom(message: LiveTalkMessage) {
         storeId = message.storeId
         authorId = message.authorId

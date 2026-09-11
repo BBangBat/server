@@ -53,15 +53,11 @@ class OAuthExchangeController(
             AuthCodeType.LOGIN -> completeLogin(payload, response)
             AuthCodeType.SIGNUP -> signupResponse(payload)
             AuthCodeType.LINK -> OAuthExchangeResponse(type = payload.type, tempToken = payload.tempToken)
-            // 연동 해제 재인증은 소셜 토큰만 확보한 상태이므로 빵밭 토큰을 새로 발급하지 않는다.
+
             AuthCodeType.UNLINK -> OAuthExchangeResponse(type = payload.type, provider = payload.provider)
         }
     }
 
-    /**
-     * 가입 화면이 성별/연령대를 미리 선택해 둘 수 있도록, 임시 토큰에 실린 소셜 제공 값을 함께 내려준다.
-     * (프론트가 임시 토큰을 직접 열어보지 않아도 되게)
-     */
     private fun signupResponse(payload: AuthCodePayload): OAuthExchangeResponse {
         val claims = payload.tempToken?.let { tempTokenProvider.parse(it) }
 
@@ -74,7 +70,6 @@ class OAuthExchangeController(
         )
     }
 
-    /** 실제 로그인 완료 시점(교환 시점)에 토큰을 발급하고 마지막 로그인 시각을 기록한다. */
     private fun completeLogin(
         payload: AuthCodePayload,
         response: HttpServletResponse,

@@ -34,42 +34,34 @@ class VoterResolverTest {
 
     @Test
     fun `인증된 회원은 MEMBER 투표자로 식별한다`() {
-        // given
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken(42L, null, emptyList())
         val request = MockHttpServletRequest()
 
-        // when
         val voter = voterResolver.resolve(request)
 
-        // then
         assertThat(voter.type).isEqualTo(VoterType.MEMBER)
         assertThat(voter.key).isEqualTo("42")
     }
 
     @Test
     fun `익명 토큰 쿠키를 가진 비회원은 GUEST 투표자로 식별한다`() {
-        // given
         val request = MockHttpServletRequest()
         request.setCookies(Cookie(VoterResolver.ANONYMOUS_COOKIE, "anon-token"))
         org.mockito.BDDMockito
             .given(anonymousTokenProvider.getAnonymousId("anon-token"))
             .willReturn("anon-123")
 
-        // when
         val voter = voterResolver.resolve(request)
 
-        // then
         assertThat(voter.type).isEqualTo(VoterType.GUEST)
         assertThat(voter.key).isEqualTo("anon-123")
     }
 
     @Test
     fun `회원도 익명 토큰도 없으면 예외를 던진다`() {
-        // given
         val request = MockHttpServletRequest()
 
-        // when & then
         assertThrows<BbangbatException> { voterResolver.resolve(request) }
     }
 }

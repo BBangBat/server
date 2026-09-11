@@ -37,6 +37,5 @@ class StorePersistenceAdapter(
 
     fun findAllByIds(ids: Collection<Long>): List<Store> = storeRepository.findAllById(ids).map { it.toDomain() }
 
-    fun findAllByNameContaining(keyword: String): List<Store> =
-        storeRepository.findAllByNameContainingIgnoreCase(keyword).map { it.toDomain() }
+    fun findAllByNameStartingWith(keyword: String): List<Store> = storeRepository.findAllByNameStartingWith(keyword).map { it.toDomain() }
 }

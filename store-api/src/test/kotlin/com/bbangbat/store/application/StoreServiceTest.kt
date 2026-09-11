@@ -28,7 +28,6 @@ class StoreServiceTest {
 
     @Test
     fun `반경 내 가게 목록을 거리순으로 반환한다`() {
-        // given
         val lat = 37.5665
         val lng = 126.9780
         val stores =
@@ -38,10 +37,8 @@ class StoreServiceTest {
             )
         given(storePersistenceAdapter.findAllWithinBounds(MapBounds.around(lat, lng, 3000.0))).willReturn(stores)
 
-        // when
         val result = storeService.findStores(lat, lng)
 
-        // then
         assertThat(result).hasSize(2)
         assertThat(result[0].name).isEqualTo("가까운 베이커리")
         assertThat(result[1].name).isEqualTo("먼 베이커리")
@@ -49,7 +46,6 @@ class StoreServiceTest {
 
     @Test
     fun `사각 영역 안이어도 반경 밖이면 제외한다`() {
-        // given (박스 모서리 쪽 가게는 중심에서 3km를 넘는다)
         val lat = 37.5665
         val lng = 126.9780
         val stores =
@@ -59,25 +55,20 @@ class StoreServiceTest {
             )
         given(storePersistenceAdapter.findAllWithinBounds(MapBounds.around(lat, lng, 3000.0))).willReturn(stores)
 
-        // when
         val result = storeService.findStores(lat, lng)
 
-        // then
         assertThat(result).hasSize(1)
         assertThat(result[0].name).isEqualTo("반경 안")
     }
 
     @Test
     fun `반경 내 가게가 없으면 빈 리스트를 반환한다`() {
-        // given
         val lat = 37.5665
         val lng = 126.9780
         given(storePersistenceAdapter.findAllWithinBounds(MapBounds.around(lat, lng, 3000.0))).willReturn(emptyList())
 
-        // when
         val result = storeService.findStores(lat, lng)
 
-        // then
         assertThat(result).isEmpty()
     }
 
@@ -111,7 +102,6 @@ class StoreServiceTest {
 
     @Test
     fun `이미지가 없는 가게는 기본 이미지 URL로 채운다`() {
-        // given
         val lat = 37.5665
         val lng = 126.9780
         val stores =
@@ -127,16 +117,13 @@ class StoreServiceTest {
             )
         given(storePersistenceAdapter.findAllWithinBounds(MapBounds.around(lat, lng, 3000.0))).willReturn(stores)
 
-        // when
         val result = storeService.findStores(lat, lng)
 
-        // then
         assertThat(result[0].imageUrl).isEqualTo(DEFAULT_IMAGE_URL)
     }
 
     @Test
     fun `이미지가 있는 가게는 원래 URL을 유지한다`() {
-        // given
         val lat = 37.5665
         val lng = 126.9780
         val customUrl = "store-specific-image-url"
@@ -153,10 +140,8 @@ class StoreServiceTest {
             )
         given(storePersistenceAdapter.findAllWithinBounds(MapBounds.around(lat, lng, 3000.0))).willReturn(stores)
 
-        // when
         val result = storeService.findStores(lat, lng)
 
-        // then
         assertThat(result[0].imageUrl).isEqualTo(customUrl)
     }
 

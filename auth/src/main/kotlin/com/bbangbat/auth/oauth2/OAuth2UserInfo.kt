@@ -3,14 +3,8 @@ package com.bbangbat.auth.oauth2
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException
 import org.springframework.security.oauth2.core.OAuth2Error
 
-/** 소셜 응답에 필수 사용자 정보가 없을 때 사용하는 에러 코드 */
 const val MISSING_USER_ATTRIBUTE_ERROR = "missing_user_attribute"
 
-/**
- * 소셜 응답에서 필수 값을 안전하게 꺼낸다.
- * 값이 없거나 타입이 다르면 강제 캐스팅 예외 대신 제어된 OAuth2AuthenticationException으로 변환한다.
- * (메시지에는 값이 아닌 키 이름만 담아 개인정보를 남기지 않는다)
- */
 private fun missingAttribute(key: String): OAuth2AuthenticationException =
     OAuth2AuthenticationException(
         OAuth2Error(MISSING_USER_ATTRIBUTE_ERROR, "소셜 계정에서 필수 정보를 가져오지 못했습니다: $key", null),
@@ -35,7 +29,6 @@ abstract class OAuth2UserInfo(
     abstract val providerId: String
     abstract val ageGroup: String?
 
-    /** MALE / FEMALE. 동의하지 않았거나 제공하지 않으면 null */
     abstract val gender: String?
 }
 
@@ -73,7 +66,6 @@ class KakaoOAuth2UserInfo(
     private val kakaoAccount = attributes.requiredMap("kakao_account")
     private val profile = kakaoAccount.requiredMap("profile")
 
-    // 카카오는 이메일이 선택 동의 항목이라 미동의 계정이면 값이 비어 있을 수 있다.
     override val email: String get() = kakaoAccount.requiredString("email")
     override val name: String get() = profile.requiredString("nickname")
     override val provider = SocialProvider.KAKAO

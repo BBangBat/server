@@ -22,7 +22,7 @@ import java.time.LocalDateTime
         UniqueConstraint(name = "uk_congestion_voter", columnNames = ["store_id", "voter_type", "voter_key"]),
     ],
     indexes = [
-        Index(name = "idx_congestion_store_voted_at", columnList = "store_id, voted_at"),
+        Index(name = "idx_congestion_store_voted_at_level", columnList = "store_id, voted_at, level"),
     ],
 )
 class CongestionVoteJpaEntity(
@@ -43,7 +43,6 @@ class CongestionVoteJpaEntity(
     @Column(name = "voted_at", nullable = false)
     var votedAt: LocalDateTime,
 ) : BaseEntity() {
-    /** 도메인 상태를 영속 엔티티에 반영한다. (더티체킹) */
     fun applyFrom(vote: CongestionVote) {
         storeId = vote.storeId
         level = vote.level

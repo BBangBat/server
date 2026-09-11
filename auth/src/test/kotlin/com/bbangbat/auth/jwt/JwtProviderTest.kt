@@ -23,42 +23,33 @@ class JwtProviderTest {
 
     @Test
     fun `유효한 액세스 토큰을 생성한다`() {
-        // given
         val memberId = 1L
 
-        // when
         val token = jwtProvider.createAccessToken(memberId)
 
-        // then
         assertThat(jwtProvider.validateToken(token)).isTrue()
         assertThat(jwtProvider.getMemberId(token)).isEqualTo(memberId)
     }
 
     @Test
     fun `유효한 리프레시 토큰을 생성한다`() {
-        // given
         val memberId = 2L
 
-        // when
         val token = jwtProvider.createRefreshToken(memberId)
 
-        // then
         assertThat(jwtProvider.validateToken(token)).isTrue()
         assertThat(jwtProvider.getMemberId(token)).isEqualTo(memberId)
     }
 
     @Test
     fun `잘못된 형식의 토큰은 검증에 실패한다`() {
-        // given
         val invalidToken = "invalid.token.string"
 
-        // when & then
         assertThat(jwtProvider.validateToken(invalidToken)).isFalse()
     }
 
     @Test
     fun `만료된 토큰은 검증에 실패한다`() {
-        // given
         val expiredJwtProvider =
             JwtProvider(
                 JwtProperties(secret = SECRET, accessTokenExpiry = 1L, refreshTokenExpiry = 1L),
@@ -66,13 +57,11 @@ class JwtProviderTest {
         val token = expiredJwtProvider.createAccessToken(1L)
         Thread.sleep(10)
 
-        // when & then
         assertThat(expiredJwtProvider.validateToken(token)).isFalse()
     }
 
     @Test
     fun `tempToken은 AT 검증에 실패한다`() {
-        // given
         val tempTokenProvider =
             TempTokenProvider(
                 JwtProperties(secret = SECRET, accessTokenExpiry = 3600000L, refreshTokenExpiry = 1209600000L),
@@ -87,20 +76,17 @@ class JwtProviderTest {
                 gender = null,
             )
 
-        // when & then
         assertThat(jwtProvider.validateToken(tempToken)).isFalse()
     }
 
     @Test
     fun `다른 시크릿으로 서명된 토큰은 파싱 시 예외가 발생한다`() {
-        // given
         val otherProvider =
             JwtProvider(
                 JwtProperties(secret = OTHER_SECRET, accessTokenExpiry = 3600000L, refreshTokenExpiry = 1209600000L),
             )
         val token = otherProvider.createAccessToken(1L)
 
-        // when & then
         assertThrows<Exception> { jwtProvider.getMemberId(token) }
     }
 

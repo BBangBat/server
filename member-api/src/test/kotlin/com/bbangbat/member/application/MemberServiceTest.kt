@@ -71,7 +71,6 @@ class MemberServiceTest {
 
     @Test
     fun `회원가입 시 회원과 소셜 계정을 저장한다`() {
-        // given
         val savedMember =
             Member(
                 id = 1L,
@@ -87,7 +86,6 @@ class MemberServiceTest {
             )
         given(memberPersistenceAdapter.save(any())).willReturn(savedMember)
 
-        // when
         val result =
             memberService.signup(
                 email = "test@test.com",
@@ -102,7 +100,6 @@ class MemberServiceTest {
                 providerId = "kakao-123",
             )
 
-        // then
         assertThat(result.id).isEqualTo(1L)
         assertThat(result.email).isEqualTo("test@test.com")
         then(socialPersistenceAdapter).should().save(
@@ -112,7 +109,6 @@ class MemberServiceTest {
 
     @Test
     fun `회원가입 시 lastLoginAt이 설정된다`() {
-        // given
         val beforeSignup = LocalDateTime.now()
         val savedMember =
             Member(
@@ -130,7 +126,6 @@ class MemberServiceTest {
         given(memberPersistenceAdapter.save(any())).willReturn(savedMember)
         val memberCaptor = argumentCaptor<Member>()
 
-        // when
         memberService.signup(
             email = "test@test.com",
             name = "홍길동",
@@ -144,38 +139,30 @@ class MemberServiceTest {
             providerId = "naver-456",
         )
 
-        // then
         verify(memberPersistenceAdapter).save(memberCaptor.capture())
         assertThat(memberCaptor.firstValue.lastLoginAt).isNotNull().isAfterOrEqualTo(beforeSignup)
     }
 
     @Test
     fun `사용 중인 닉네임이면 true를 반환한다`() {
-        // given
         given(memberPersistenceAdapter.existsByNickname("빵괴물")).willReturn(true)
 
-        // when
         val result = memberService.existsByNickname("빵괴물")
 
-        // then
         assertThat(result).isTrue()
     }
 
     @Test
     fun `사용 가능한 닉네임이면 false를 반환한다`() {
-        // given
         given(memberPersistenceAdapter.existsByNickname("새닉네임")).willReturn(false)
 
-        // when
         val result = memberService.existsByNickname("새닉네임")
 
-        // then
         assertThat(result).isFalse()
     }
 
     @Test
     fun `이미 가입된 이메일이면 예외를 던지고 저장하지 않는다`() {
-        // given (같은 이메일로 다른 소셜 가입 시도)
         val existing =
             Member(
                 id = 1L,
@@ -191,7 +178,6 @@ class MemberServiceTest {
             )
         given(memberPersistenceAdapter.findByEmailOrNull("test@test.com")).willReturn(existing)
 
-        // when & then
         val exception =
             assertThrows<BbangbatException> {
                 memberService.signup(
@@ -215,7 +201,6 @@ class MemberServiceTest {
 
     @Test
     fun `연동 시 기존 회원에 소셜 계정을 추가한다`() {
-        // given
         val existing =
             Member(
                 id = 1L,
@@ -233,10 +218,8 @@ class MemberServiceTest {
         given(socialPersistenceAdapter.findByProviderAndProviderId(SocialType.NAVER, "naver-123")).willReturn(null)
         given(memberPersistenceAdapter.update(any())).willAnswer { it.getArgument<Member>(0) }
 
-        // when
         val result = memberService.link("test@test.com", SocialType.NAVER, "naver-123")
 
-        // then
         assertThat(result.id).isEqualTo(1L)
         then(socialPersistenceAdapter).should().save(
             Social(member = existing, provider = SocialType.NAVER, providerId = "naver-123"),
@@ -251,10 +234,8 @@ class MemberServiceTest {
 
     @Test
     fun `연동할 회원이 없으면 예외를 던진다`() {
-        // given
         given(memberPersistenceAdapter.findByEmailOrNull("none@test.com")).willReturn(null)
 
-        // when & then
         val exception =
             assertThrows<BbangbatException> {
                 memberService.link("none@test.com", SocialType.NAVER, "naver-123")
@@ -266,7 +247,6 @@ class MemberServiceTest {
 
     @Test
     fun `이미 연동된 소셜 계정이면 예외를 던진다`() {
-        // given
         val existing =
             Member(
                 id = 1L,
@@ -284,7 +264,6 @@ class MemberServiceTest {
         given(memberPersistenceAdapter.findByEmailOrNull("test@test.com")).willReturn(existing)
         given(socialPersistenceAdapter.findByProviderAndProviderId(SocialType.NAVER, "naver-123")).willReturn(alreadyLinked)
 
-        // when & then
         val exception =
             assertThrows<BbangbatException> {
                 memberService.link("test@test.com", SocialType.NAVER, "naver-123")
@@ -307,7 +286,6 @@ class MemberServiceTest {
 
     @Test
     fun `프로필 수정은 도메인이 병합한 결과를 어댑터에 넘긴다`() {
-        // given
         val current =
             Member(
                 id = 1L,
@@ -324,7 +302,6 @@ class MemberServiceTest {
         given(memberPersistenceAdapter.existsByNickname("새닉네임")).willReturn(false)
         given(memberPersistenceAdapter.update(any())).willAnswer { it.getArgument<Member>(0) }
 
-        // when
         val result =
             memberService.updateProfile(
                 memberId = 1L,
@@ -335,7 +312,6 @@ class MemberServiceTest {
                 ageGroup = AgeGroup.THIRTIES,
             )
 
-        // then (null인 필드는 기존 값 유지)
         assertThat(result.name).isEqualTo("기존회원")
         assertThat(result.nickname).isEqualTo("새닉네임")
         assertThat(result.gender).isEqualTo(Gender.MALE)
@@ -344,7 +320,6 @@ class MemberServiceTest {
 
     @Test
     fun `프로필 수정 시에도 도메인 규칙 위반은 걸러진다`() {
-        // given
         val current =
             Member(
                 id = 1L,
@@ -359,7 +334,6 @@ class MemberServiceTest {
             )
         given(memberPersistenceAdapter.findById(1L)).willReturn(current)
 
-        // when & then (생성 때만이 아니라 수정 때도 형식 검증이 돈다)
         assertThrows<IllegalArgumentException> {
             memberService.updateProfile(
                 memberId = 1L,

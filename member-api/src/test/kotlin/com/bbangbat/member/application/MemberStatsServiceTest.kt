@@ -29,16 +29,13 @@ class MemberStatsServiceTest {
 
     @Test
     fun `회원의 리뷰 즐겨찾기 톡 수를 집계한다`() {
-        // given
         val memberId = 1L
         given(reviewPort.countByMemberId(memberId)).willReturn(3L)
         given(favoritePersistenceAdapter.countByMemberId(memberId)).willReturn(5L)
         given(livePort.countByMemberId(memberId)).willReturn(7L)
 
-        // when
         val result = memberStatsService.getStats(memberId)
 
-        // then
         assertThat(result.reviewCount).isEqualTo(3L)
         assertThat(result.favoriteCount).isEqualTo(5L)
         assertThat(result.talkCount).isEqualTo(7L)

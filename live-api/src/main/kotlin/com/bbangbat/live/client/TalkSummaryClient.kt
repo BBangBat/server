@@ -6,10 +6,6 @@ import software.amazon.awssdk.services.sqs.SqsClient
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import tools.jackson.databind.ObjectMapper
 
-/**
- * 톡 요약 요청을 SQS 요청 큐로 발행한다 (Spring → AI 서버, 비동기).
- * 결과는 TalkSummaryResultPoller가 결과 큐에서 수신해 저장한다.
- */
 @Component
 class TalkSummaryClient(
     private val sqsClient: SqsClient,

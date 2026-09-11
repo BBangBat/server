@@ -58,7 +58,6 @@ class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error)
     }
 
-    /** @Validated 컨트롤러의 파라미터 검증 실패 (@Size 등) */
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleHandlerMethodValidationException(e: HandlerMethodValidationException): ResponseEntity<ErrorResponse> {
         val message = e.allErrors.firstOrNull()?.defaultMessage ?: ErrorCode.INVALID_INPUT.message
@@ -68,7 +67,6 @@ class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorResponse(code = ErrorCode.INVALID_INPUT.name, message = message))
     }
 
-    /** 요청 본문 역직렬화 실패 (필수 값 누락, 타입/형식 오류 등) */
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> {
         log.warn("요청 본문 파싱 실패: {}", e.mostSpecificCause.message)
@@ -82,7 +80,6 @@ class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error)
     }
 
-    /** 필수 쿠키 누락 (예: refresh_token 없이 재발급 요청) */
     @ExceptionHandler(MissingRequestCookieException::class)
     fun handleMissingRequestCookieException(e: MissingRequestCookieException): ResponseEntity<ErrorResponse> {
         log.warn("필수 쿠키 누락: {}", e.cookieName)

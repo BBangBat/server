@@ -27,7 +27,6 @@ class TempTokenProviderTest {
 
     @Test
     fun `유효한 tempToken을 파싱한다`() {
-        // given
         val token =
             tempTokenProvider.createTempToken(
                 email = "test@naver.com",
@@ -38,10 +37,8 @@ class TempTokenProviderTest {
                 gender = "MALE",
             )
 
-        // when
         val claims = tempTokenProvider.parse(token)
 
-        // then
         assertThat(claims.email).isEqualTo("test@naver.com")
         assertThat(claims.name).isEqualTo("홍길동")
         assertThat(claims.provider).isEqualTo(SocialProvider.NAVER)
@@ -51,10 +48,8 @@ class TempTokenProviderTest {
 
     @Test
     fun `AT를 tempToken으로 파싱하면 예외를 던진다`() {
-        // given
         val accessToken = jwtProvider.createAccessToken(1L)
 
-        // when & then
         assertThrows<BbangbatException> { tempTokenProvider.parse(accessToken) }
     }
 

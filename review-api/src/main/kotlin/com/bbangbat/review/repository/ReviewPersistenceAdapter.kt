@@ -4,7 +4,6 @@ import com.bbangbat.common.exception.BbangbatException
 import com.bbangbat.common.exception.ErrorCode.REVIEW_NOT_FOUND
 import com.bbangbat.review.domain.Review
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Transactional
 
 @Repository
 class ReviewPersistenceAdapter(
@@ -32,7 +31,6 @@ class ReviewPersistenceAdapter(
 
     fun countByMemberId(memberId: Long): Long = reviewRepository.countByMemberId(memberId)
 
-    /** 가게별 빵명록 수를 IN + group by 단일 쿼리로 집계한다. (가게 목록 N+1 방지) */
     fun countByStoreIds(storeIds: Collection<Long>): List<StoreReviewCount> {
         val results: List<StoreReviewCount?> =
             reviewRepository.findAll {
@@ -71,7 +69,6 @@ class ReviewPersistenceAdapter(
         }
     }
 
-    @Transactional
     fun save(review: Review): Review {
         val entity =
             reviewRepository.save(
@@ -92,7 +89,6 @@ class ReviewPersistenceAdapter(
         return entity.toDomain(menus = review.menus, imageUrls = review.imageUrls)
     }
 
-    @Transactional
     fun delete(review: Review) {
         val entity = reviewRepository.findById(review.id).orElseThrow { BbangbatException(REVIEW_NOT_FOUND) }
 

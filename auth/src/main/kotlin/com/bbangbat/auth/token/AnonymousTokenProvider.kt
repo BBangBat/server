@@ -44,6 +44,6 @@ class AnonymousTokenProvider(
 
     companion object {
         private const val TOKEN_TYPE = "ANONYMOUS"
-        const val EXPIRY = 31_536_000_000L // 365일
+        const val EXPIRY = 31_536_000_000L
     }
 }

@@ -13,10 +13,14 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "members")
+@Table(
+    name = "members",
+    uniqueConstraints = [UniqueConstraint(name = "uk_members_nickname", columnNames = ["nickname"])],
+)
 class MemberJpaEntity(
     @Id
     @Tsid
@@ -46,10 +50,6 @@ class MemberJpaEntity(
     @Column(name = "last_login_at", nullable = true)
     var lastLoginAt: LocalDateTime? = null,
 ) : BaseEntity() {
-    /**
-     * 도메인 상태를 영속 엔티티에 반영한다. (더티체킹)
-     * 식별자와 감사 컬럼(createdAt/updatedAt)은 영속성 계층이 관리하므로 건드리지 않는다.
-     */
     fun applyFrom(member: Member) {
         email = member.email
         name = member.name

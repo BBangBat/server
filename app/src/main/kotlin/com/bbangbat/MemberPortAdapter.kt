@@ -10,7 +10,6 @@ import com.bbangbat.auth.oauth2.MemberPort as AuthMemberPort
 import com.bbangbat.live.application.MemberPort as LiveMemberPort
 import com.bbangbat.review.application.MemberPort as ReviewMemberPort
 
-/** 다른 모듈이 회원 정보를 필요로 할 때 쓰는 포트들의 구현 */
 @Component
 class MemberPortAdapter(
     private val memberService: MemberService,

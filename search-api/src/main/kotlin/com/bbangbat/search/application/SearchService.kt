@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service
 class SearchService(
     private val storePersistenceAdapter: StorePersistenceAdapter,
 ) {
-    fun searchStores(keyword: String): List<Store> = storePersistenceAdapter.findAllByNameContaining(keyword)
+    fun searchStores(keyword: String): List<Store> = storePersistenceAdapter.findAllByNameStartingWith(keyword)
 }

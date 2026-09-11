@@ -14,11 +14,6 @@ class StoreService(
     private val storePersistenceAdapter: StorePersistenceAdapter,
     @param:Value("\${app.store.default-image-url}") private val defaultImageUrl: String,
 ) {
-    /**
-     * 내 주변 가게 조회. 좌표 인덱스를 타는 사각 영역으로 후보를 좁힌 뒤,
-     * 실제 거리(Haversine)로 반경 밖을 걸러내고 가까운 순으로 정렬한다.
-     * 거리 함수를 WHERE에 두면 인덱스를 타지 못해 전체 스캔이 된다.
-     */
     fun findStores(
         lat: Double,
         lng: Double,
@@ -39,9 +34,8 @@ class StoreService(
         return withDefaultImage(store)
     }
 
-    /**
-     * 지도 사각 영역 내 가게 조회. 요청 범위는 서비스 지역(대전)으로 잘라내고 결과 수를 제한한다.
-     */
+    fun exists(storeId: Long): Boolean = storePersistenceAdapter.findByIdOrNull(storeId) != null
+
     fun findInBounds(bounds: MapBounds): List<Store> {
         val clamped = bounds.clampToServiceArea() ?: return emptyList()
 

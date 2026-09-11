@@ -26,7 +26,6 @@ class JwtProvider(
         provider: String? = null,
     ): String = createToken(memberId, provider, jwtProperties.refreshTokenExpiry)
 
-    /** 이번 로그인에 사용한 소셜 제공자. 예전에 발급된 토큰에는 없을 수 있다. */
     fun getProvider(token: String): String? =
         Jwts
             .parser()

@@ -26,7 +26,7 @@ class JwtAuthenticationFilter(
                         null,
                         listOf(SimpleGrantedAuthority("ROLE_MEMBER")),
                     )
-                // 현재 로그인에 사용한 소셜 제공자 (마이페이지 표시용)
+
                 auth.details = jwtProvider.getProvider(token)
                 SecurityContextHolder.getContext().authentication = auth
             }

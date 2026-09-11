@@ -47,16 +47,13 @@ class TalkServiceTest {
 
     @Test
     fun `메시지 전송 시 작성자 닉네임을 스냅샷으로 저장한다`() {
-        // given
         val storeId = 1L
         val authorId = 10L
         given(memberPort.getNickname(authorId)).willReturn("빵순이")
         given(talkPersistenceAdapter.saveMessage(any())).willAnswer { it.arguments[0] }
 
-        // when
         val result = talkService.sendMessage(storeId, authorId, "지금 사람 많아요!")
 
-        // then
         val captor = argumentCaptor<LiveTalkMessage>()
         then(talkPersistenceAdapter).should().saveMessage(captor.capture())
         assertThat(captor.firstValue.authorNickname).isEqualTo("빵순이")
@@ -67,30 +64,24 @@ class TalkServiceTest {
 
     @Test
     fun `afterId가 없으면 최근 24시간 윈도우 내 메시지를 조회한다`() {
-        // given
         val storeId = 1L
         given(talkPersistenceAdapter.findRecentMessages(eq(storeId), any(), eq(null))).willReturn(emptyList())
 
-        // when
         talkService.getMessages(storeId, null)
 
-        // then
         then(talkPersistenceAdapter).should().findRecentMessages(eq(storeId), any(), eq(null))
     }
 
     @Test
     fun `afterId가 있으면 해당 ID 이후 메시지만 조회한다`() {
-        // given
         val storeId = 1L
         val afterId = 5L
         given(talkPersistenceAdapter.findRecentMessages(eq(storeId), any(), eq(afterId))).willReturn(
             listOf(message(storeId, id = 6L)),
         )
 
-        // when
         val result = talkService.getMessages(storeId, afterId)
 
-        // then
         then(talkPersistenceAdapter).should().findRecentMessages(eq(storeId), any(), eq(afterId))
         assertThat(result).hasSize(1)
         assertThat(result[0].id).isEqualTo(6L)
@@ -98,9 +89,8 @@ class TalkServiceTest {
 
     @Test
     fun `활성 가게 중 마지막 요약 이후 새 톡이 있는 가게만 요약을 요청한다`() {
-        // given
-        val newTalkStore = ActiveStore(storeId = 1L, latestMessageId = 100L) // 요약 없음 → 요청
-        val unchangedStore = ActiveStore(storeId = 2L, latestMessageId = 50L) // 마지막 요약과 동일 → 스킵
+        val newTalkStore = ActiveStore(storeId = 1L, latestMessageId = 100L)
+        val unchangedStore = ActiveStore(storeId = 2L, latestMessageId = 50L)
         given(talkPersistenceAdapter.findActiveStores(any(), eq(5L))).willReturn(listOf(newTalkStore, unchangedStore))
         given(talkPersistenceAdapter.findSummaryByStoreId(1L)).willReturn(null)
         given(talkPersistenceAdapter.findSummaryByStoreId(2L)).willReturn(
@@ -110,27 +100,22 @@ class TalkServiceTest {
             listOf(message(1L, id = 100L)),
         )
 
-        // when
         talkService.summarizeActiveStores()
 
-        // then
         then(talkSummaryClient).should().requestSummary(eq(1L), eq(100L), any())
         then(talkSummaryClient).should(never()).requestSummary(eq(2L), any(), any())
     }
 
     @Test
     fun `빈 storeIds면 요약을 조회하지 않고 빈 리스트를 반환한다`() {
-        // when
         val result = talkService.getSummaries(emptyList())
 
-        // then
         assertThat(result).isEmpty()
         verifyNoInteractions(talkPersistenceAdapter)
     }
 
     @Test
     fun `storeIds로 요약을 벌크 조회한다`() {
-        // given
         val storeIds = listOf(1L, 2L)
         given(talkPersistenceAdapter.findSummariesByStoreIds(storeIds)).willReturn(
             listOf(
@@ -139,23 +124,18 @@ class TalkServiceTest {
             ),
         )
 
-        // when
         val result = talkService.getSummaries(storeIds)
 
-        // then
         assertThat(result).hasSize(2)
         assertThat(result.map { it.storeId }).containsExactly(1L, 2L)
     }
 
     @Test
     fun `작성자 본인은 톡을 소프트 삭제하고 운영자 조회는 하지 않는다`() {
-        // given
         given(talkPersistenceAdapter.findMessageById(1L)).willReturn(message(storeId = 1L))
 
-        // when
         talkService.deleteMessage(messageId = 1L, memberId = AUTHOR_ID)
 
-        // then
         val captor = argumentCaptor<LiveTalkMessage>()
 
         then(talkPersistenceAdapter).should().updateMessage(captor.capture())
@@ -165,24 +145,19 @@ class TalkServiceTest {
 
     @Test
     fun `운영자는 남의 톡도 소프트 삭제할 수 있다`() {
-        // given
         given(talkPersistenceAdapter.findMessageById(1L)).willReturn(message(storeId = 1L))
         given(memberPort.isAdmin(999L)).willReturn(true)
 
-        // when
         talkService.deleteMessage(messageId = 1L, memberId = 999L)
 
-        // then
         then(talkPersistenceAdapter).should().updateMessage(any())
     }
 
     @Test
     fun `작성자도 운영자도 아니면 삭제할 수 없다`() {
-        // given
         given(talkPersistenceAdapter.findMessageById(1L)).willReturn(message(storeId = 1L))
         given(memberPort.isAdmin(999L)).willReturn(false)
 
-        // when & then
         val exception =
             assertThrows<BbangbatException> {
                 talkService.deleteMessage(messageId = 1L, memberId = 999L)
@@ -194,10 +169,8 @@ class TalkServiceTest {
 
     @Test
     fun `이미 삭제된 톡은 없는 것으로 취급한다`() {
-        // given
         given(talkPersistenceAdapter.findMessageById(1L)).willReturn(message(storeId = 1L).delete(LocalDateTime.now()))
 
-        // when & then
         val exception =
             assertThrows<BbangbatException> {
                 talkService.deleteMessage(messageId = 1L, memberId = AUTHOR_ID)
@@ -209,14 +182,11 @@ class TalkServiceTest {
 
     @Test
     fun `기존 요약이 있으면 새로 저장하지 않고 갱신한다`() {
-        // given
         val existing = StoreTalkSummary(id = 7L, storeId = 1L, summary = "이전 요약", lastMessageId = 10L)
         given(talkPersistenceAdapter.findSummaryByStoreId(1L)).willReturn(existing)
 
-        // when
         talkService.saveSummary(storeId = 1L, summary = "최신 요약", lastMessageId = 20L)
 
-        // then
         val captor = argumentCaptor<StoreTalkSummary>()
 
         then(talkPersistenceAdapter).should().updateSummary(captor.capture())
@@ -228,13 +198,10 @@ class TalkServiceTest {
 
     @Test
     fun `기존 요약이 없으면 새로 저장한다`() {
-        // given
         given(talkPersistenceAdapter.findSummaryByStoreId(1L)).willReturn(null)
 
-        // when
         talkService.saveSummary(storeId = 1L, summary = "요약", lastMessageId = 20L)
 
-        // then
         then(talkPersistenceAdapter).should().saveSummary(any())
         then(talkPersistenceAdapter).should(never()).updateSummary(any())
     }

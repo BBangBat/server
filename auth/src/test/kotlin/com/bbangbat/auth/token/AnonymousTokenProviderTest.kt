@@ -24,26 +24,21 @@ class AnonymousTokenProviderTest {
 
     @Test
     fun `발급한 익명 토큰에서 anonymousId를 추출한다`() {
-        // given
         val anonymousId = "anon-123"
         val token = anonymousTokenProvider.createAnonymousToken(anonymousId)
 
-        // when & then
         assertThat(anonymousTokenProvider.getAnonymousId(token)).isEqualTo(anonymousId)
     }
 
     @Test
     fun `AT는 익명 토큰으로 파싱하면 null을 반환한다`() {
-        // given
         val accessToken = jwtProvider.createAccessToken(1L)
 
-        // when & then
         assertThat(anonymousTokenProvider.getAnonymousId(accessToken)).isNull()
     }
 
     @Test
     fun `잘못된 형식의 토큰은 null을 반환한다`() {
-        // when & then
         assertThat(anonymousTokenProvider.getAnonymousId("invalid.token.string")).isNull()
     }
 

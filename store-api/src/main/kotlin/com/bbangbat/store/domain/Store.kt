@@ -17,7 +17,6 @@ data class Store(
     }
 
     companion object {
-        /** 내 주변 가게 조회 반경 */
         const val SEARCH_RADIUS_METERS = 3000.0
     }
 }

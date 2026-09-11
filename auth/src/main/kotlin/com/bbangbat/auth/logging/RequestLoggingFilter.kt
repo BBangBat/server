@@ -11,10 +11,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.util.UUID
 
-/**
- * /api/ 요청의 요약(메서드·경로·상태·처리시간)을 한 줄로 남기고,
- * nginx가 전파한 X-Request-ID(없으면 생성)를 MDC에 넣어 요청 전체 로그를 하나의 ID로 추적한다.
- */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class RequestLoggingFilter : OncePerRequestFilter() {

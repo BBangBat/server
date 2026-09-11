@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface StoreRepository :
     JpaRepository<StoreJpaEntity, Long>,
     KotlinJdslJpqlExecutor {
-    fun findAllByNameContainingIgnoreCase(name: String): List<StoreJpaEntity>
+    fun findAllByNameStartingWith(name: String): List<StoreJpaEntity>
 
     fun findAllByLatitudeBetweenAndLongitudeBetween(
         south: Double,

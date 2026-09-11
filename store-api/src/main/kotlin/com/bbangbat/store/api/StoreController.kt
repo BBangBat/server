@@ -91,7 +91,6 @@ class StoreController(
         return StoreResponse.from(store, storeStatsService.reviewCounts(listOf(storeId)).getValue(storeId))
     }
 
-    /** 가게 목록에 빵명록 수를 한 번의 집계 조회로 붙인다. */
     private fun withReviewCounts(stores: List<Store>): List<StoreResponse> =
         StoreResponse.listOf(stores, storeStatsService.reviewCounts(stores.map { it.id }))
 }

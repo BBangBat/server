@@ -17,7 +17,6 @@ class ReviewService(
 ) {
     fun getReviews(storeId: Long): List<AuthoredReview> = withAuthors(reviewPersistenceAdapter.findAllByStoreId(storeId))
 
-    /** 작성자 닉네임을 붙인다. 탈퇴 등으로 회원이 없으면 대체 표기를 사용한다. */
     private fun withAuthors(reviews: List<Review>): List<AuthoredReview> {
         val authors = memberPort.findAuthors(reviews.map { it.memberId }.toSet())
 
@@ -41,7 +40,6 @@ class ReviewService(
     @Transactional(readOnly = true)
     fun countByMemberId(memberId: Long): Long = reviewPersistenceAdapter.countByMemberId(memberId)
 
-    /** 가게 ID → 빵명록 수. 빵명록이 없는 가게는 결과에서 빠진다. */
     @Transactional(readOnly = true)
     fun countByStoreIds(storeIds: Collection<Long>): Map<Long, Long> =
         reviewPersistenceAdapter.countByStoreIds(storeIds).associate { it.storeId to it.count }

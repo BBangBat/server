@@ -32,7 +32,6 @@ class CustomOAuth2UserService(
                 "name" to userInfo.name,
                 "provider" to userInfo.provider,
                 "providerId" to userInfo.providerId,
-                // 연동 해제 재인증(purpose=unlink)일 때만 성공 핸들러가 이 토큰을 보관한다.
                 SOCIAL_ACCESS_TOKEN_ATTRIBUTE to userRequest.accessToken.tokenValue,
             )
 

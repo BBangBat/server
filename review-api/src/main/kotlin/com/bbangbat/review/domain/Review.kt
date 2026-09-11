@@ -19,6 +19,5 @@ data class Review(
         require(imageUrls.size <= 5) { "사진은 최대 5장까지 업로드할 수 있습니다." }
     }
 
-    /** 삭제 권한. 작성자 본인만 삭제할 수 있다. */
     fun canBeDeletedBy(memberId: Long): Boolean = this.memberId == memberId
 }

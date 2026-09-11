@@ -48,14 +48,11 @@ class TokenServiceTest {
 
     @Test
     fun `Redis에 RT를 저장한다`() {
-        // given
         val memberId = 1L
         val refreshToken = "sample-refresh-token"
 
-        // when
         tokenService.saveRefreshToken(memberId, refreshToken)
 
-        // then
         then(valueOperations).should().set(
             eq("RT:$memberId"),
             eq(refreshToken),
@@ -65,15 +62,12 @@ class TokenServiceTest {
 
     @Test
     fun `유효한 RT로 새 AT와 RT를 반환한다`() {
-        // given
         val memberId = 1L
         val refreshToken = jwtProvider.createRefreshToken(memberId)
         given(valueOperations.get("RT:$memberId")).willReturn(refreshToken)
 
-        // when
         val (newAt, newRt) = tokenService.rotateToken(refreshToken)
 
-        // then
         assertThat(jwtProvider.getMemberId(newAt)).isEqualTo(memberId)
         assertThat(jwtProvider.getMemberId(newRt)).isEqualTo(memberId)
         assertThat(newAt).isNotEqualTo(newRt)
@@ -81,33 +75,26 @@ class TokenServiceTest {
 
     @Test
     fun `유효하지 않은 RT면 예외를 던진다`() {
-        // given
         val invalidToken = "invalid.token.string"
 
-        // when & then
         assertThrows<BbangbatException> { tokenService.rotateToken(invalidToken) }
     }
 
     @Test
     fun `Redis에 저장된 RT와 다르면 예외를 던진다`() {
-        // given
         val memberId = 1L
         val refreshToken = jwtProvider.createRefreshToken(memberId)
         given(valueOperations.get("RT:$memberId")).willReturn("different-token")
 
-        // when & then
         assertThrows<BbangbatException> { tokenService.rotateToken(refreshToken) }
     }
 
     @Test
     fun `Redis에서 RT를 삭제한다`() {
-        // given
         val memberId = 1L
 
-        // when
         tokenService.deleteRefreshToken(memberId)
 
-        // then
         then(redisTemplate).should().delete("RT:$memberId")
     }
 

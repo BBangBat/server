@@ -36,14 +36,11 @@ class LiveTalkMessageTest {
 
     @Test
     fun `delete는 삭제 시각을 채우고 원본은 그대로 둔다`() {
-        // given
         val original = message()
         val deletedAt = LocalDateTime.now()
 
-        // when
         val deleted = original.delete(deletedAt)
 
-        // then
         assertThat(deleted.isDeleted).isTrue()
         assertThat(deleted.deletedAt).isEqualTo(deletedAt)
         assertThat(original.isDeleted).isFalse()
@@ -66,16 +63,13 @@ class LiveTalkMessageTest {
 
     @Test
     fun `작성자 본인이면 운영자 여부를 조회하지 않는다`() {
-        // given
         var adminChecked = false
 
-        // when
         message().canBeDeletedBy(AUTHOR_ID) {
             adminChecked = true
             true
         }
 
-        // then
         assertThat(adminChecked).isFalse()
     }
 

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service
 import java.time.Duration
 import java.util.UUID
 
-/** OAuth 결과를 교환하기 위한 1회용 코드의 종류 */
 enum class AuthCodeType { LOGIN, SIGNUP, LINK, UNLINK }
 
 data class AuthCodePayload(
@@ -17,12 +16,6 @@ data class AuthCodePayload(
     val existingAccount: Boolean = false,
 )
 
-/**
- * 액세스 토큰/임시 토큰을 리다이렉트 URL에 직접 싣지 않기 위한 1회용 교환 코드.
- *
- * URL에는 코드만 남고, 코드는 짧게 만료되며 한 번 사용하면 즉시 폐기된다.
- * (브라우저 히스토리, Referer, 서버 액세스 로그에 토큰이 남지 않도록)
- */
 @Service
 class AuthCodeService(
     private val redisTemplate: StringRedisTemplate,
@@ -38,7 +31,6 @@ class AuthCodeService(
         return code
     }
 
-    /** 코드를 소비한다. 조회와 삭제가 원자적으로 처리돼 재사용을 막는다. */
     fun consume(code: String): AuthCodePayload? = redisTemplate.opsForValue().getAndDelete(key(code))?.let { deserialize(it) }
 
     private fun serialize(payload: AuthCodePayload): String =
@@ -63,10 +55,8 @@ class AuthCodeService(
     }
 
     companion object {
-        /** 리다이렉트 직후 곧바로 교환되므로 짧게 유지한다. */
         private val CODE_TTL = Duration.ofSeconds(60)
 
-        /** JWT(base64url + dot)와 provider 이름에 나타나지 않는 구분자 */
         private const val DELIMITER = "|"
     }
 }

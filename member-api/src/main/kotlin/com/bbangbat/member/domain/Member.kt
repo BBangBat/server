@@ -7,7 +7,6 @@ data class Member(
     val email: String,
     val name: String,
     val nickname: String,
-    /** S3 오브젝트 key (예: members/{uuid}). 전체 URL은 조회 시 조립한다. */
     val profileImageKey: String? = null,
     val gender: Gender,
     val ageGroup: AgeGroup,
@@ -36,10 +35,6 @@ data class Member(
         require(privacyAgreed) { "개인정보처리방침에 동의해야 합니다." }
     }
 
-    /**
-     * 프로필 수정. null인 필드는 기존 값을 유지한다.
-     * 변경된 값은 생성자 init의 도메인 규칙(이름/닉네임 길이·형식, 이미지 키 형식)을 다시 통과한다.
-     */
     fun updateProfile(
         name: String? = null,
         nickname: String? = null,
@@ -55,7 +50,6 @@ data class Member(
             ageGroup = ageGroup ?: this.ageGroup,
         )
 
-    /** 로그인 시각을 기록한다. */
     fun login(at: LocalDateTime): Member = copy(lastLoginAt = at)
 
     companion object {

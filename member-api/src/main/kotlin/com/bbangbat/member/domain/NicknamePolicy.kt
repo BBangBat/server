@@ -1,10 +1,5 @@
 package com.bbangbat.member.domain
 
-/**
- * 닉네임 정책. 요청 DTO 검증과 도메인 검증이 같은 규칙을 공유한다.
- *
- * 완성형 한글/영문/숫자만 허용하므로 자음/모음 단독(ㄱ, ㅏ 등)과 공백은 자연히 걸러진다.
- */
 object NicknamePolicy {
     const val MIN_LENGTH = 2
     const val MAX_LENGTH = 10

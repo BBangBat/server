@@ -12,7 +12,10 @@ import jakarta.persistence.Table
 @Entity
 @Table(
     name = "stores",
-    indexes = [Index(name = "idx_stores_latitude_longitude", columnList = "latitude, longitude")],
+    indexes = [
+        Index(name = "idx_stores_latitude_longitude", columnList = "latitude, longitude"),
+        Index(name = "idx_stores_name", columnList = "name"),
+    ],
 )
 class StoreJpaEntity(
     @Id

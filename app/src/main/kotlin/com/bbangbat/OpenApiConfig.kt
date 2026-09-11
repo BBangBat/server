@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class OpenApiConfig {
     init {
-        // @AuthMember는 SecurityContext에서 주입되는 커스텀 파라미터라
-        // springdoc이 쿼리 파라미터로 오인하지 않도록 명세에서 제외한다.
         SpringDocUtils.getConfig().addAnnotationsToIgnore(AuthMember::class.java)
     }
 
