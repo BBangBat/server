@@ -34,6 +34,8 @@ class StoreService(
         return withDefaultImage(store)
     }
 
+    fun exists(storeId: Long): Boolean = storePersistenceAdapter.findByIdOrNull(storeId) != null
+
     fun findInBounds(bounds: MapBounds): List<Store> {
         val clamped = bounds.clampToServiceArea() ?: return emptyList()
 

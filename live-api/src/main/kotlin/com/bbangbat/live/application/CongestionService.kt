@@ -4,14 +4,10 @@ import com.bbangbat.auth.voter.Voter
 import com.bbangbat.auth.voter.VoterType
 import com.bbangbat.common.exception.BbangbatException
 import com.bbangbat.common.exception.ErrorCode.CONGESTION_VOTE_COOLDOWN
-import com.bbangbat.common.exception.ErrorCode.CONGESTION_VOTE_TOO_FAR
-import com.bbangbat.common.exception.ErrorCode.OUT_OF_SERVICE_AREA
 import com.bbangbat.common.exception.ErrorCode.STORE_NOT_FOUND
-import com.bbangbat.common.geo.GeoDistance
 import com.bbangbat.live.domain.Congestion
 import com.bbangbat.live.domain.CongestionLevel
 import com.bbangbat.live.domain.CongestionVote
-import com.bbangbat.live.domain.ServiceArea
 import com.bbangbat.live.repository.CongestionVotePersistenceAdapter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataIntegrityViolationException
@@ -24,22 +20,21 @@ import java.time.LocalDateTime
 class CongestionService(
     private val congestionVotePersistenceAdapter: CongestionVotePersistenceAdapter,
     private val storePort: StorePort,
-    @param:Value("\${app.congestion.vote-max-distance-meters}") private val maxDistanceMeters: Double,
     @param:Value("\${app.congestion.vote-cooldown-minutes}") private val cooldownMinutes: Long,
 ) {
     @Transactional
     fun vote(
         storeId: Long,
         level: CongestionLevel,
-        latitude: Double,
-        longitude: Double,
         voter: Voter,
     ): Congestion {
-        verifyLocation(storeId, latitude, longitude)
+        if (!storePort.exists(storeId)) {
+            throw BbangbatException(STORE_NOT_FOUND)
+        }
 
         val now = LocalDateTime.now()
 
-        val existing = congestionVotePersistenceAdapter.findByVoterForUpdate(storeId, voter.type, voter.key)
+        val existing = congestionVotePersistenceAdapter.findByVoter(storeId, voter.type, voter.key)
 
         if (existing != null) {
             verifyCooldown(existing.votedAt, now)
@@ -81,23 +76,6 @@ class CongestionService(
     @Transactional
     fun deleteVotesByMember(memberId: Long) {
         congestionVotePersistenceAdapter.deleteAllByVoter(VoterType.MEMBER, memberId.toString())
-    }
-
-    private fun verifyLocation(
-        storeId: Long,
-        latitude: Double,
-        longitude: Double,
-    ) {
-        if (!ServiceArea.contains(latitude, longitude)) {
-            throw BbangbatException(OUT_OF_SERVICE_AREA)
-        }
-
-        val store = storePort.findCoordinates(storeId) ?: throw BbangbatException(STORE_NOT_FOUND)
-        val distance = GeoDistance.meters(latitude, longitude, store.latitude, store.longitude)
-
-        if (distance > maxDistanceMeters) {
-            throw BbangbatException(CONGESTION_VOTE_TOO_FAR)
-        }
     }
 
     private fun verifyCooldown(

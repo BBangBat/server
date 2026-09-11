@@ -18,6 +18,7 @@ dependencies {
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.jackson.module.kotlin)
     testImplementation(libs.spring.boot.starter.data.jpa.test)
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.testcontainers.mysql)

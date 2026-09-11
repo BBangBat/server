@@ -5,11 +5,13 @@ import com.bbangbat.live.domain.CongestionLevel
 import com.bbangbat.live.domain.CongestionVote
 import com.bbangbat.live.support.AbstractContainerBaseTest
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.context.annotation.Import
+import org.springframework.dao.DataIntegrityViolationException
 import java.time.LocalDateTime
 
 @Import(CongestionVotePersistenceAdapter::class)
@@ -87,6 +89,17 @@ class CongestionVotePersistenceAdapterTest
             assertThat(store1[CongestionLevel.NORMAL]).isEqualTo(1)
             assertThat(store1[CongestionLevel.UNCROWDED]).isNull()
             assertThat(store2[CongestionLevel.UNCROWDED]).isEqualTo(1)
+        }
+
+        @Test
+        fun `같은 투표자의 투표를 중복 저장하면 unique 제약에 걸린다`() {
+            congestionVotePersistenceAdapter.save(vote(storeId = 1L, level = CongestionLevel.NORMAL, voterKey = "10"))
+            em.flush()
+
+            assertThatThrownBy {
+                congestionVotePersistenceAdapter.save(vote(storeId = 1L, level = CongestionLevel.CROWDED, voterKey = "10"))
+                em.flush()
+            }.isInstanceOf(DataIntegrityViolationException::class.java)
         }
 
         private fun vote(

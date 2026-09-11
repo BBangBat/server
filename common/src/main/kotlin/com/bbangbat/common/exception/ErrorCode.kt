@@ -28,8 +28,6 @@ enum class ErrorCode(
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."),
     CONGESTION_UNAVAILABLE(HttpStatus.NOT_FOUND, "혼잡도 정보를 조회할 수 없습니다."),
 
-    OUT_OF_SERVICE_AREA(HttpStatus.FORBIDDEN, "대전 지역에서만 이용할 수 있습니다."),
-    CONGESTION_VOTE_TOO_FAR(HttpStatus.FORBIDDEN, "가게 근처에서만 혼잡도를 투표할 수 있습니다."),
     CONGESTION_VOTE_COOLDOWN(HttpStatus.TOO_MANY_REQUESTS, "잠시 후 다시 투표할 수 있습니다."),
 
     TALK_NOT_FOUND(HttpStatus.NOT_FOUND, "실시간 톡을 찾을 수 없습니다."),

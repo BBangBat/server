@@ -21,16 +21,6 @@ class CongestionVotePersistenceAdapter(
             .orElse(null)
             ?.toDomain()
 
-    fun findByVoterForUpdate(
-        storeId: Long,
-        voterType: VoterType,
-        voterKey: String,
-    ): CongestionVote? =
-        congestionVoteRepository
-            .findWithLockByStoreIdAndVoterTypeAndVoterKey(storeId, voterType, voterKey)
-            .orElse(null)
-            ?.toDomain()
-
     fun deleteAllByVoter(
         voterType: VoterType,
         voterKey: String,
